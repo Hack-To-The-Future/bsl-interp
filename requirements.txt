@@ -1,0 +1,9 @@
+black
+flake8
+pytest
+opencv-python
+numpy
+matplotlib
+tensorflow
+tensorflow-datasets
+certifi
