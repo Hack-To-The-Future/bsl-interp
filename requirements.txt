@@ -7,4 +7,5 @@ matplotlib
 tensorflow
 tensorflow-datasets
 certifi
+scikit-learn
 typer[all]
