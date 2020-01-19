@@ -1,12 +1,14 @@
 import typer
 import time
 
-from app import app
 from app.utils import webcam_capture, init_webcam
+from app.tf_utils import format_tf
+
+app = typer.Typer()
 
 
-@app.command("record")
-def record_dataset(
+@app.command("create")
+def create_dataset(
     label: str,
     flip: bool = typer.Option(True, help="Flips the webcam horizontally"),
     record_time: int = typer.Option(5, help="Seconds of data to record")
@@ -32,4 +34,13 @@ def record_dataset(
             timer -= 1
 
     typer.echo(f"Recorded {len(data)} images!")
+    
     typer.Exit()
+
+
+@app.command("list")
+def list_datasets():
+    """
+    Lists datasets and labels currently saved
+    """
+    typer.echo("Not implemented")
