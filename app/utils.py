@@ -13,7 +13,7 @@ def webcam_capture(
     flip: bool,
     text: str = None,
     filename: str = None,
-    dataset: List[cv2.VideoCapture] = None
+    data: List[str] = None,
 ):
 
     bottomLeftCornerOfText = (10, 40)
@@ -27,21 +27,20 @@ def webcam_capture(
 
     if text is not None:
         cv2.putText(
-            frame, text,
+            frame,
+            text,
             bottomLeftCornerOfText,
             cv2.FONT_HERSHEY_SIMPLEX,
             fontScale,
             fontColor,
-            lineType
+            lineType,
         )
 
-    cv2.imshow('frame', frame)
+    cv2.imshow("frame", frame)
     cv2.waitKey(1)
 
     if filename is not None:
         cv2.imwrite(f"{filename}.jpg", frame)
 
-    if dataset is not None:
-        dataset.append(frame)
-
-    return dataset
+    if data is not None:
+        data.append(frame)

@@ -19,7 +19,7 @@ def test_webcam(
     cap = init_webcam()
     while True:
         webcam_capture(cap, flip)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord("q"):
             typer.echo(f"Exiting...")
             break
 
@@ -29,7 +29,7 @@ def test_webcam(
 @app.command("photo")
 def save_photo(
     name: str,
-    flip: bool = typer.Option(True, help="Flips the webcam horizontally")
+    flip: bool = typer.Option(True, help="Flips the webcam horizontally"),
 ):
     """
     Takes a photo and saves it with the NAME provided

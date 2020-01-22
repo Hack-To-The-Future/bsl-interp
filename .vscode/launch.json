@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "module": "app.bsl-magic",
-            "args": ["datasets","create","a"]
+            "args": ["datasets","load","a"]
         }
     ]
 }

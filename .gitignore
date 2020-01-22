@@ -132,3 +132,4 @@ dmypy.json
 bsl-interp
 cats_vs_dogs
 *.jpg
+*.tfrecords
