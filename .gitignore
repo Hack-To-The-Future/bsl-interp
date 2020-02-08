@@ -135,3 +135,5 @@ cats_vs_dogs
 *.tfrecords
 class.pkl
 labels.pkl
+logits.npy
+labels.npy

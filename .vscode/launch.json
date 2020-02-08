@@ -19,7 +19,7 @@
             "args": [
                 "datasets",
                 "create",
-                "a"
+                "mat"
             ]
         },
         {

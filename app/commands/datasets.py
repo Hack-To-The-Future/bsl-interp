@@ -14,7 +14,7 @@ app = typer.Typer()
 def create_dataset(
     label: str,
     flip: bool = typer.Option(True, help="Flips the webcam horizontally"),
-    record_time: int = typer.Option(8, help="Seconds of data to record"),
+    record_time: int = typer.Option(5, help="Seconds of data to record"),
 ):
     """
     Records images from the webcam and stores them as a
@@ -27,7 +27,7 @@ def create_dataset(
     timer = 4
     start_time = time.time()
     data = []
-    while timer > -record_time:
+    while timer > -(record_time + 1):
         text = f"{timer}"
         if timer < 0:
             text = "Recording!"
