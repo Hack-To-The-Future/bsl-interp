@@ -11,7 +11,7 @@ def init_webcam():
 def add_text_to_frame(frame: cv2.VideoCapture, text: str):
     bottomLeftCornerOfText = (10, 40)
     fontScale = 1
-    fontColor = (255, 255, 255)
+    fontColor = (50, 50, 50)
     lineType = 2
 
     cv2.putText(
