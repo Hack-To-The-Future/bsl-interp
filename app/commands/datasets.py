@@ -3,7 +3,7 @@ import time
 
 import typer
 
-from app.tf_utils import CLASS_FILE, LABEL_FILE
+from app.tf_utils import CLASS_FILE, LABEL_FILE, LABELS_FILE, LOGITS_FILE
 from app.tf_utils import init_model, load_label_dict, save_data
 from app.utils import init_webcam, webcam_capture
 
@@ -60,13 +60,13 @@ def list_labels():
 @app.command("erase")
 def remove_model():
     """
-    Removes the model, note it's not possible
-    to remove individual lables
+    Removes the model
     """
-    if os.path.isfile(LABEL_FILE):
-        os.remove(LABEL_FILE)
+    # TODO: extend to remove individual labels
+    files = [LABEL_FILE, CLASS_FILE, LABELS_FILE, LOGITS_FILE]
 
-    if os.path.isfile(CLASS_FILE):
-        os.remove(CLASS_FILE)
+    for f in files:
+        if os.path.isfile(f):
+            os.remove(f)
 
     typer.echo("Model deleted")
