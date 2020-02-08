@@ -5,9 +5,9 @@
 Once you've cloned this git repository, `cd` into the root directory and create a new python virtual environment. The following instructions are for Windows:
 
 ```
-~\AppData\Local\Programs\Python\Python37\python.exe -m pip install --upgrade pip
-~\AppData\Local\Programs\Python\Python37\python.exe -m pip install --upgrade virtualenv
-~\AppData\Local\Programs\Python\Python37\python.exe -m virtualenv -p python3.7 bsl-interp
+<path-to-python37>\python.exe -m pip install --upgrade pip
+<path-to-python37>\python.exe -m pip install --upgrade virtualenv
+<path-to-python37>\python.exe -m virtualenv bsl-interp
 ```
 
 Now activate your virtual environment, in Windows that would look like this:
