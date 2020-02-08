@@ -1,66 +1,104 @@
-from typing import List
+import os
+import pickle
+from typing import Dict, List
 
 import numpy as np
 import tensorflow as tf
 import typer
 from cv2 import cv2
+from sklearn import neighbors
 
-IMAGE_SIZE = 92
-
-
-def save_data(data: List[cv2.VideoCapture], label: str):
-    with tf.io.TFRecordWriter(f"{label}.tfrecords") as writer:
-        with typer.progressbar(data) as progress:
-            for img in progress:
-                img = np.asarray(
-                    tf.image.resize(img, (IMAGE_SIZE, IMAGE_SIZE)).numpy(),
-                    dtype=np.uint8,
-                )
-                proto = serialise(img.tobytes(), label)
-                writer.write(proto.SerializeToString())
+IMAGE_SIZE = 96  # options: [96, 128, 160, 192, 224]
+LABEL_FILE = "labels.pkl"
+CLASS_FILE = "class.pkl"
+WEIGHTS = "distance"  # or use uniform
+NN = 100
 
 
-def serialise(img_str: str, label: str):
-    feature = {
-        "label": tf.train.Feature(
-            bytes_list=tf.train.BytesList(value=[label.encode()])
-        ),
-        "image_raw": tf.train.Feature(
-            bytes_list=tf.train.BytesList(value=[img_str])
-        ),
-    }
-    return tf.train.Example(features=tf.train.Features(feature=feature))
+def save_data(
+    data: List[cv2.VideoCapture],
+    label: str,
+    model: tf.keras.applications.MobileNetV2
+):
+    convt_imgs = []
+    with typer.progressbar(data) as progress:
+        for img in progress:
+            convt_imgs.append(process_image(img))
+
+    # Get predictions
+    images4d = np.asarray(convt_imgs)
+    predictions = model.predict(images4d)
+    typer.echo(f"Predictions completed for {len(convt_imgs)} images")
+    label_dict = load_label_dict()
+    label_num = set_label_number(label, label_dict)
+
+    # Update model
+    classifier = load_classifier()
+    classifier.fit(predictions, [label_num] * len(convt_imgs))
+
+    # Save model and classifier
+    save_label_dict(label_dict)
+    save_classifier(classifier)
 
 
-def load_data(label: str):
-    raw_image_dataset = tf.data.TFRecordDataset(f"{label}.tfrecords")
-    return raw_image_dataset.map(_parse_image)
-
-
-def _parse_image(proto):
-    image_features = {
-        "label": tf.io.FixedLenFeature([], tf.string),
-        "image_raw": tf.io.FixedLenFeature([], tf.string),
-    }
-    image_features = tf.io.parse_single_example(proto, image_features)
-    return image_features
-
-
-def get_image(features):
-    image_raw = features["image_raw"].numpy()
-    np_img = np.frombuffer(image_raw, dtype=np.uint8)
-    return np.resize(np_img, (IMAGE_SIZE, IMAGE_SIZE, 3))
-
-
-def format_tf(data: List[cv2.VideoCapture], label: str):
-    dataset = tf.data.Dataset.from_tensor_slices(
-        (tf.constant(data), tf.constant([label] * len(data)))
-    )
-    dataset = dataset.map(proc_img)
-    return dataset
-
-
-def proc_img(frame: cv2.VideoCapture, label):
-    img = (tf.cast(frame, tf.float32) / 127.5) - 1
-    img = tf.image.resize(img, (IMAGE_SIZE, IMAGE_SIZE))
+def process_image(img: cv2.VideoCapture) -> np.ndarray:
+    img = (tf.cast(img, tf.float32)/127.5) - 1
+    img = tf.image.resize(img, (IMAGE_SIZE, IMAGE_SIZE)).numpy()
     return img
+
+
+def load_label_dict() -> Dict[str, int]:
+    if os.path.isfile(LABEL_FILE):
+        with open(LABEL_FILE, "rb") as f:
+            return pickle.loads(f.read())
+    else:
+        return {}
+
+
+def save_label_dict(label_dict: Dict[str, int]):
+    with open(LABEL_FILE, "wb+") as f:
+        f.write(pickle.dumps(label_dict))
+
+
+def load_classifier() -> neighbors.KNeighborsClassifier:
+    if os.path.isfile(CLASS_FILE):
+        with open(CLASS_FILE, "rb") as f:
+            return pickle.loads(f.read())
+    else:
+        return neighbors.KNeighborsClassifier(NN, weights=WEIGHTS)
+
+
+def save_classifier(knn: neighbors.KNeighborsClassifier):
+    with open(CLASS_FILE, "wb+") as f:
+        f.write(pickle.dumps(knn))
+
+
+def set_label_number(label, label_dict: Dict[str, int]):
+    if label in label_dict:
+        return label_dict[label]
+    else:
+        num = len(label_dict)
+        label_dict[label] = num
+        return num
+
+
+def get_label(labels: Dict[str, int], num: int) -> str:
+    return list(labels.keys())[list(labels.values()).index(num)]
+
+
+def init_model():
+    IMG_SHAPE = (IMAGE_SIZE, IMAGE_SIZE, 3)
+
+    # Pre-trained model with MobileNetV2
+    base_model = tf.keras.applications.MobileNetV2(
+        input_shape=IMG_SHAPE,
+        include_top=False,
+        weights='imagenet'
+    )
+    base_model.trainable = False
+    global_average_layer = tf.keras.layers.GlobalAveragePooling2D()
+    model = tf.keras.Sequential([
+        base_model,
+        global_average_layer
+    ])
+    return model

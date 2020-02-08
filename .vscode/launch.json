@@ -5,11 +5,33 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Module",
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Create Dataset",
             "type": "python",
             "request": "launch",
             "module": "app.bsl-magic",
-            "args": ["datasets","load","a"]
+            "args": [
+                "datasets",
+                "create",
+                "a"
+            ]
+        },
+        {
+            "name": "Run Model",
+            "type": "python",
+            "request": "launch",
+            "module": "app.bsl-magic",
+            "args": [
+                "model",
+                "run"
+            ]
         }
+
     ]
 }
