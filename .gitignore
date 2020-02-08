@@ -133,3 +133,5 @@ bsl-interp
 cats_vs_dogs
 *.jpg
 *.tfrecords
+class.pkl
+labels.pkl
