@@ -1,9 +1,10 @@
 black
-flake8
+mypy
 opencv-python
 numpy
 matplotlib
 tensorflow
 certifi
 scikit-learn
+pywin32
 typer[all]

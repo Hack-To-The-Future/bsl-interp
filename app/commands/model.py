@@ -1,17 +1,15 @@
-import numpy as np
-import typer
 from datetime import datetime
-from cv2 import cv2
-import tensorflow as tf
 
-from app.tf_utils import (
-    init_model,
-    load_classifier,
-    load_label_dict,
-    process_image,
-    get_label,
-)
-from app.utils import init_webcam, web_img_gen, add_text_to_frame
+import numpy as np
+import tensorflow as tf
+import typer
+from cv2 import cv2
+
+import win32com.client as wincl
+
+from app.tf_utils import (get_label, init_model, load_classifier,
+                          load_label_dict, process_image)
+from app.utils import add_text_to_frame, init_webcam, web_img_gen
 
 app = typer.Typer()
 
@@ -64,3 +62,6 @@ def run_model(
             break
 
     typer.echo(f"Recorded word: {word}")
+    speak = wincl.Dispatch("SAPI.SpVoice")
+    speak.Speak(word)
+    typer.Exit()
